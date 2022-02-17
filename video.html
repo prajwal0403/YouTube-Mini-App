@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="yt.css">
+    <style>
+        iframe{
+            margin-left: 20px;
+        }
+        
+        #navbar{
+            height: 100px;
+        }
+        #main{
+            display: flex;
+            height: 500px;
+
+        }
+        #video_details{
+            flex: 3;
+            font-size: 20px;
+            margin-left: 100px;
+        }
+        #video_details>p{
+            padding-left: 20px;
+            padding-bottom: 20px;
+
+        }
+        #search_result{
+            display: grid;
+            grid-template-columns: repeat(1,fr);
+            grid-gap: 15px;
+            flex: 1;
+            
+            margin-right: 100px;
+        }
+        .alla{
+            display: flex;
+            font-size: 15px;
+            
+        }
+        .alla>p{
+            padding-left: 15px;
+            
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar">
+        <div id="nav" style="display: flex;">
+            <div><img id="menu" src="menu.png" alt=""></div>
+            <div><img id="yt" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6pTnp8ABjcheRKZBK5ipUc32u-vQQ8G8lrs4IUrpvEougX2HIHx-veIDH_Jd5fQQweMk&usqp=CAU" alt=""></div>
+            <input type="text" id="video" placeholder="Search" /><div onclick="searchVideo()" id="small">
+                <img id="search" src="search.png" alt="">
+            </div>
+            <div >
+                <img id="mic" src="mic-alt.svg" alt="mic">
+            </div>
+            <div><img id="profile" src="profile.png" alt=""></div>
+        </div>
+    </div>
+    <div id="main">
+        <div id="video_details"></div>
+        <div id="search_result"></div>
+    </div>
+</body>
+</html>
+<script>
+    let {videoId,snippet:{title}}=JSON.parse(localStorage.getItem("clicked_video"))
+    console.log(title);
+    let video_div=document.getElementById("video_details")
+    let iframe=document.createElement("iframe")
+    let name=document.createElement("p")
+    name.innerHTML=title
+    iframe.src=`https://www.youtube.com/embed/${videoId}`
+    iframe.width="80%"
+    iframe.height="400px"
+    iframe.setAttribute("allowfullscreen","true")
+
+    video_div.append(iframe,name)
+
+
+
+
+    const results_div=document.getElementById("search_result");
+
+async function searchVideo(){
+ 
+ try{ 
+    let response= await fetch(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=trending&type=video&key=AIzaSyAjJ9JfRn7o_pYYJnPsqAgoKpGD600QDQU&maxResults=10`);
+    let data=await response.json()
+    let videos=data.items; 
+
+    appendvideos(videos);
+
+
+    console.log(data)
+ }
+ catch(err){
+     console.log(err);
+ }
+}
+
+const appendvideos = (items) =>{
+    results_div.innerHTML=null;
+    items.forEach(({snippet, id:{videoId}}) => {
+            // let { 
+            //     medium: { url }, }=el.snippet.thumbnails;
+            // console.log(url);
+
+           let div=document.createElement("div")
+           div.setAttribute("class","alla")
+            let iframe=document.createElement("img");
+            iframe.src=snippet.thumbnails.medium.url;
+            iframe.height="160";
+            iframe.width="250";
+            let name=document.createElement("p")
+            name.textContent=snippet.title
+            div.append(iframe,name)
+            results_div.append(div)
+    })
+
+}
+searchVideo();
+
+</script>
